@@ -5,20 +5,17 @@ const isCI = Boolean(process.env.CI);
 export default defineConfig({
   testDir: './tests/e2e',
 
-  /* Run independent tests in parallel */
-  fullyParallel: true,
+  /* Public demo application is more reliable with sequential execution */
+fullyParallel: false,
+
+/* Prevent cross-browser test instability caused by parallel load */
+workers: 1,
 
   /* Prevent accidental test.only commits in CI */
   forbidOnly: isCI,
 
   /* Retry failed tests only in CI */
   retries: isCI ? 2 : 0,
-
-  /*
-   * Use one worker in CI.
-   * Locally, omit this property so Playwright uses its default worker count.
-   */
-  ...(isCI ? { workers: 1 } : {}),
 
   /* Generate HTML execution report */
   reporter: [

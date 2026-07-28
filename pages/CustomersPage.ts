@@ -12,15 +12,8 @@ export class CustomersPage {
     this.customerRows = page.locator('table tbody tr');
   }
 
-  async verifyCustomersPage(): Promise<void> {
-    await expect(this.searchInput).toBeVisible();
-    await expect(this.customerRows.first()).toBeVisible();
-  }
-
-  async verifyCustomerExists(customer: Customer): Promise<void> {
-    await this.searchInput.fill(customer.firstName);
-
-    const customerRow = this.customerRows
+  private getCustomerRow(customer: Customer): Locator {
+    return this.customerRows
       .filter({
         has: this.page.locator('td:nth-child(1)', {
           hasText: customer.firstName,
@@ -35,9 +28,20 @@ export class CustomersPage {
         has: this.page.locator('td:nth-child(3)', {
           hasText: customer.postCode,
         }),
-      })
-      .first();
+      });
+  }
 
+  async verifyCustomersPage(): Promise<void> {
+    await expect(this.searchInput).toBeVisible();
+    await expect(this.customerRows.first()).toBeVisible();
+  }
+
+  async verifyCustomerExists(customer: Customer): Promise<void> {
+    await this.searchInput.fill(customer.firstName);
+
+    const customerRow = this.getCustomerRow(customer);
+
+    await expect(customerRow).toHaveCount(1);
     await expect(customerRow).toBeVisible();
 
     const cells = customerRow.locator('td');
@@ -55,5 +59,36 @@ export class CustomersPage {
     for (const customer of customers) {
       await this.verifyCustomerExists(customer);
     }
+  }
+
+  async deleteCustomer(customer: Customer): Promise<void> {
+    await this.searchInput.fill(customer.firstName);
+
+    const customerRow = this.getCustomerRow(customer);
+
+    await expect(customerRow).toHaveCount(1);
+    await expect(customerRow).toBeVisible();
+
+    await customerRow
+      .getByRole('button', {
+        name: 'Delete',
+        exact: true,
+      })
+      .click();
+
+    await expect(customerRow).toHaveCount(0);
+    await this.searchInput.clear();
+  }
+
+  async verifyCustomerDoesNotExist(
+    customer: Customer,
+  ): Promise<void> {
+    await this.searchInput.fill(customer.firstName);
+
+    const customerRow = this.getCustomerRow(customer);
+
+    await expect(customerRow).toHaveCount(0);
+
+    await this.searchInput.clear();
   }
 }
