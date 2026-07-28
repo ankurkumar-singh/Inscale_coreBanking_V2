@@ -28,7 +28,7 @@ export default defineConfig({
   /* Common configuration for every browser */
   use: {
     /* Add the application URL later */
-    // baseURL: 'https://application-url.com',
+    baseURL: 'https://www.globalsqa.com/angularJs-protractor/BankingProject/',
 
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
