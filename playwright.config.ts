@@ -6,10 +6,10 @@ export default defineConfig({
   testDir: './tests/e2e',
 
   /* Public demo application is more reliable with sequential execution */
-fullyParallel: false,
+  fullyParallel: false,
 
-/* Prevent cross-browser test instability caused by parallel load */
-workers: 1,
+  /* Prevent cross-browser test instability caused by parallel load */
+  workers: 1,
 
   /* Prevent accidental test.only commits in CI */
   forbidOnly: isCI,
@@ -19,27 +19,27 @@ workers: 1,
 
   /* Generate HTML execution report */
   reporter: [
-  ['line'],
-  [
-    'html',
-    {
-      outputFolder: 'playwright-report',
-      open: 'never',
-    },
+    ['line'],
+    [
+      'html',
+      {
+        outputFolder: 'playwright-report',
+        open: 'never',
+      },
+    ],
   ],
-],
 
   /* Common configuration for every browser */
   use: {
-    /* Add the application URL */
-  baseURL:
-    process.env.BASE_URL ??
-    'https://www.globalsqa.com/angularJs-protractor/BankingProject/',
+    /* Application URL with optional environment override */
+    baseURL:
+      process.env.BASE_URL ??
+      'https://www.globalsqa.com/angularJs-protractor/BankingProject/',
 
-  trace: 'retain-on-failure',
-  screenshot: 'only-on-failure',
-  video: 'retain-on-failure',
-},
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
 
   /* Cross-browser execution */
   projects: [
@@ -62,11 +62,4 @@ workers: 1,
       },
     },
   ],
-
-  /* Configure only if the application runs locally */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !isCI,
-  // },
 });

@@ -1,6 +1,10 @@
 # Inscale Core Banking Automation
 
-Playwright and TypeScript-based end-to-end automation framework for testing the GlobalSQA Banking application.
+Playwright and TypeScript-based end-to-end automation framework for testing customer management and transaction processing workflows in the GlobalSQA Banking application.
+
+## Version
+
+**Current Version:** 1.1
 
 ## Technology Stack
 
@@ -8,6 +12,7 @@ Playwright and TypeScript-based end-to-end automation framework for testing the 
 - TypeScript
 - Node.js
 - Excel-based test data
+- Page Object Model
 - GitHub Actions
 - Playwright HTML Reporter
 
@@ -15,32 +20,43 @@ Playwright and TypeScript-based end-to-end automation framework for testing the 
 
 ### Q1 — Customer Management
 
-- Read customer data from Excel
-- Add all customers through Bank Manager login
-- Verify first name, last name, and postcode
-- Delete the specified customers
-- Verify deleted customers are no longer displayed
+- Read seven customer records from Excel
+- Log in as Bank Manager
+- Add all customers through the application
+- Verify each customer's first name, last name, and postcode
+- Delete Jackson Frank and Christopher Connely
+- Verify that the deleted customers are no longer displayed
+- Attach the final customer-table screenshot to the HTML report
 
 ### Q2 — Transaction Processing
 
-- Read transaction data from Excel
-- Log in using the required customer
+- Read seven transaction records from Excel
+- Log in as Hermoine Granger
+- Select account number 1003
+- Capture the starting account balance
 - Process credit and debit transactions
-- Calculate the expected balance
-- Validate the displayed balance after each transaction
+- Calculate the expected balance after each transaction
+- Validate the displayed balance after every transaction
+- Verify the final account balance
+- Attach the final-balance screenshot and transaction-summary JSON to the HTML report
 
 ## Framework Structure
 
 ```text
-├── .github/workflows/       # GitHub Actions CI workflow
-├── models/                  # TypeScript data models
-├── pages/                   # Page Object Model classes
-├── test-data/               # Excel test data
-├── tests/e2e/               # End-to-end test specifications
-├── utils/                   # Excel reader and balance calculator
-├── playwright.config.ts     # Playwright configuration
-├── tsconfig.json            # TypeScript configuration
-└── package.json             # Dependencies and execution scripts
+├── .github/
+│   └── workflows/               # GitHub Actions CI workflow
+├── fixtures/                    # Assessment reference files
+├── docs/                        # Exploratory testing and quality report
+├── models/                      # TypeScript data models
+├── pages/                       # Page Object Model classes
+├── test-data/                   # Excel test data
+├── tests/
+│   └── e2e/                     # End-to-end test specifications
+├── utils/                       # Excel reader and balance calculator
+├── playwright.config.ts         # Playwright configuration
+├── tsconfig.json                # TypeScript configuration
+├── package.json                 # Dependencies and execution scripts
+└── README.md                    # Project documentation
 ```
 
 ## Prerequisites
@@ -50,8 +66,17 @@ Playwright and TypeScript-based end-to-end automation framework for testing the 
 
 ## Installation
 
+Clone or extract the project and navigate to its root directory.
+
+Install the locked project dependencies:
+
 ```bash
 npm ci
+```
+
+Install the Playwright browsers:
+
+```bash
 npx playwright install
 ```
 
@@ -69,19 +94,58 @@ Run tests on Chromium:
 npm run test:chromium
 ```
 
-Run tests on all configured browsers:
+Run the complete cross-browser test suite:
 
 ```bash
 npm test
 ```
 
-The framework is configured for:
+The framework is configured to execute on:
 
 - Chromium
 - Firefox
 - WebKit
 
-## Test Report
+Tests run sequentially using one worker to avoid instability caused by parallel load on the public demo application.
+
+## Base URL Configuration
+
+The default application URL is configured in `playwright.config.ts`.
+
+A different environment URL can be provided through the `BASE_URL` environment variable.
+
+PowerShell:
+
+```powershell
+$env:BASE_URL="https://example.com/"
+npm test
+```
+
+Command Prompt:
+
+```cmd
+set BASE_URL=https://example.com/
+npm test
+```
+
+Bash:
+
+```bash
+BASE_URL="https://example.com/" npm test
+```
+
+## Test Data
+
+The framework reads its test data from the Excel workbook inside the `test-data` directory.
+
+The workbook contains:
+
+- Customer records for Q1
+- Credit and debit transactions for Q2
+
+The Excel reader validates the required columns, transaction types, and transaction amounts before the application workflow begins.
+
+## Test Reporting
 
 Open the latest Playwright HTML report:
 
@@ -89,14 +153,63 @@ Open the latest Playwright HTML report:
 npm run report
 ```
 
-Screenshots and videos are retained for failed tests. Trace collection is enabled on the first retry.
+The report provides:
+
+- Cross-browser execution results
+- Business-readable `test.step()` details
+- Failure screenshots and videos
+- Traces retained for failed tests
+- Final customer-table screenshot for Q1
+- Final account-balance screenshot for Q2
+- Transaction-summary JSON for Q2
 
 ## Continuous Integration
 
-GitHub Actions automatically performs the following on pushes and pull requests to `main` or `master`:
+GitHub Actions executes the automation suite for:
 
-1. Installs project dependencies
-2. Validates TypeScript
-3. Installs Playwright browsers
-4. Executes the complete cross-browser test suite
-5. Uploads the Playwright HTML report
+- Pushes to `main`
+- Pull requests targeting `main`
+- Manually triggered workflow runs
+
+The workflow performs the following steps:
+
+1. Checks out the repository
+2. Sets up Node.js
+3. Installs dependencies using `npm ci`
+4. Validates the TypeScript code
+5. Installs Playwright browsers and system dependencies
+6. Executes the complete cross-browser test suite
+7. Uploads the Playwright HTML report
+8. Adds an execution summary to the workflow run
+
+## Downloading the CI Test Report
+
+After a GitHub Actions workflow completes:
+
+1. Open the repository on GitHub
+2. Select the **Actions** tab
+3. Open the required **Playwright Tests** workflow run
+4. Scroll to the **Artifacts** section
+5. Download the `playwright-report` artifact
+6. Extract the downloaded ZIP
+7. Open `index.html` in a browser
+
+The report artifact is retained for 90 days.
+
+## Failure Diagnostics
+
+The framework is configured with:
+
+- Retries only in the CI environment
+- Trace retention for failed tests
+- Screenshots captured on failure
+- Videos retained on failure
+- Playwright HTML and line reporters
+
+## Exploratory Testing & Quality Assessment Report
+
+In addition to the automated scenarios, exploratory testing was performed on the GlobalSQA Banking application to identify confirmed defects, business-rule observations requiring validation, and UI/UX improvement opportunities.
+
+The report includes documented findings, business impact, steps to reproduce, expected and actual results, severity classifications, and supporting evidence.
+
+[View the Exploratory Testing & Quality Assessment Report](docs/Exploratory%20Testing%20%26%20Quality%20Assessment%20Report.docx)

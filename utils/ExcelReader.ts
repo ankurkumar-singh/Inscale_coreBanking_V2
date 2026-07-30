@@ -57,7 +57,7 @@ function parseRows<T extends object, C extends string>(
 ): T[] {
   const result = parseSheetData<T, C>(rows, schema);
 
-  if (result.errors) {
+  if (result.errors !== undefined) {
     const details = result.errors
       .map(
         (error) =>
@@ -68,11 +68,13 @@ function parseRows<T extends object, C extends string>(
     throw new Error(`Invalid data in "${sheetName}" sheet: ${details}`);
   }
 
-  if (result.objects.length === 0) {
+  const objects = result.objects;
+
+  if (objects.length === 0) {
     throw new Error(`No test data found in "${sheetName}" sheet.`);
   }
 
-  return result.objects;
+  return objects;
 }
 
 export class ExcelReader {

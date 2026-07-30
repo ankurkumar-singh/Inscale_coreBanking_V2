@@ -15,7 +15,7 @@ export class AddCustomerPage {
     this.lastNameInput = page.getByPlaceholder('Last Name');
     this.postCodeInput = page.getByPlaceholder('Post Code');
 
-    this.addCustomerButton = page.getByRole('form')  .getByRole('button', {
+    this.addCustomerButton = page.getByRole('form').getByRole('button', {
     name: 'Add Customer',
     exact: true,
   });
