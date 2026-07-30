@@ -19,18 +19,27 @@ workers: 1,
 
   /* Generate HTML execution report */
   reporter: [
-    ['html', { open: 'never' }],
+  ['line'],
+  [
+    'html',
+    {
+      outputFolder: 'playwright-report',
+      open: 'never',
+    },
   ],
+],
 
   /* Common configuration for every browser */
   use: {
-    /* Add the application URL later */
-    baseURL: 'https://www.globalsqa.com/angularJs-protractor/BankingProject/',
+    /* Add the application URL */
+  baseURL:
+    process.env.BASE_URL ??
+    'https://www.globalsqa.com/angularJs-protractor/BankingProject/',
 
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
-  },
+  trace: 'retain-on-failure',
+  screenshot: 'only-on-failure',
+  video: 'retain-on-failure',
+},
 
   /* Cross-browser execution */
   projects: [

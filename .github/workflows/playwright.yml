@@ -2,9 +2,10 @@ name: Playwright Tests
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -19,7 +20,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 20
           cache: npm
 
       - name: Install dependencies
@@ -40,4 +41,14 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
-          retention-days: 30
+          retention-days: 90
+
+      - name: Add execution summary
+        if: ${{ always() }}
+        run: |
+          echo "## Playwright Test Execution" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Status: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Browsers: Chromium, Firefox and WebKit" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Scenarios: Customer Management and Transaction Processing" >> "$GITHUB_STEP_SUMMARY"
+          echo "- HTML report: Download the playwright-report artifact" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_STEP_SUMMARY"
