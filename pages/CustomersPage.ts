@@ -4,12 +4,14 @@ import type { Customer } from '../models/Customer';
 export class CustomersPage {
   private readonly page: Page;
   private readonly searchInput: Locator;
+  private readonly customerTable: Locator;
   private readonly customerRows: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.searchInput = page.getByPlaceholder('Search Customer');
-    this.customerRows = page.locator('table tbody tr');
+    this.customerTable = page.locator('table');
+    this.customerRows = this.customerTable.locator('tbody tr');
   }
 
   private getCustomerRow(customer: Customer): Locator {
@@ -33,6 +35,7 @@ export class CustomersPage {
 
   async verifyCustomersPage(): Promise<void> {
     await expect(this.searchInput).toBeVisible();
+    await expect(this.customerTable).toBeVisible();
     await expect(this.customerRows.first()).toBeVisible();
   }
 
@@ -90,5 +93,22 @@ export class CustomersPage {
     await expect(customerRow).toHaveCount(0);
 
     await this.searchInput.clear();
+  }
+
+  async captureFilteredCustomerTable(
+    postCode: string,
+    expectedRowCount: number,
+  ): Promise<Buffer> {
+    await this.searchInput.fill(postCode);
+
+    await expect(this.customerRows).toHaveCount(expectedRowCount);
+    await expect(this.customerRows.first()).toBeVisible();
+    await expect(this.customerTable).toBeVisible();
+
+    const screenshot = await this.customerTable.screenshot();
+
+    await this.searchInput.clear();
+
+    return screenshot;
   }
 }

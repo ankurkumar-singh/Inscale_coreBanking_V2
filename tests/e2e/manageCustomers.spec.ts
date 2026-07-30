@@ -3,7 +3,19 @@ import { AddCustomerPage } from '../../pages/AddCustomerPage';
 import { CustomersPage } from '../../pages/CustomersPage';
 import { LoginPage } from '../../pages/LoginPage';
 import { ManagerPage } from '../../pages/ManagerPage';
+import type { Customer } from '../../models/Customer';
 import { ExcelReader } from '../../utils/ExcelReader';
+
+function isSameCustomer(
+  firstCustomer: Customer,
+  secondCustomer: Customer,
+): boolean {
+  return (
+    firstCustomer.firstName === secondCustomer.firstName &&
+    firstCustomer.lastName === secondCustomer.lastName &&
+    firstCustomer.postCode === secondCustomer.postCode
+  );
+}
 
 test.describe('Q1 - Manage customers', () => {
   test(
@@ -29,6 +41,18 @@ test.describe('Q1 - Manage customers', () => {
         customersToDelete,
         'Exactly 2 specified customers should be selected for deletion',
       ).toHaveLength(2);
+
+      const remainingCustomers = customers.filter(
+        (customer) =>
+          !customersToDelete.some((customerToDelete) =>
+            isSameCustomer(customer, customerToDelete),
+          ),
+      );
+
+      expect(
+        remainingCustomers,
+        'Exactly 5 customers should remain after deletion',
+      ).toHaveLength(5);
 
       const loginPage = new LoginPage(page);
       const managerPage = new ManagerPage(page);
@@ -64,6 +88,33 @@ test.describe('Q1 - Manage customers', () => {
         },
       );
 
+      const postCodesBeforeDeletion = [
+        ...new Set(customers.map((customer) => customer.postCode)),
+      ];
+
+      for (const postCode of postCodesBeforeDeletion) {
+        const expectedCustomers = customers.filter(
+          (customer) => customer.postCode === postCode,
+        );
+
+        await test.step(
+          `Attach customers before deletion for postcode ${postCode}`,
+          async () => {
+            await testInfo.attach(
+              `customers-before-deletion-${postCode}`,
+              {
+                body:
+                  await customersPage.captureFilteredCustomerTable(
+                    postCode,
+                    expectedCustomers.length,
+                  ),
+                contentType: 'image/png',
+              },
+            );
+          },
+        );
+      }
+
       for (const customer of customersToDelete) {
         await test.step(
           `Delete and verify customer: ${customer.firstName} ${customer.lastName}`,
@@ -74,12 +125,34 @@ test.describe('Q1 - Manage customers', () => {
         );
       }
 
-      await test.step('Attach final customer table evidence', async () => {
-        await testInfo.attach('final-customer-table', {
-          body: await page.screenshot({ fullPage: true }),
-          contentType: 'image/png',
-        });
-      });
+      const postCodesAfterDeletion = [
+        ...new Set(
+          remainingCustomers.map((customer) => customer.postCode),
+        ),
+      ];
+
+      for (const postCode of postCodesAfterDeletion) {
+        const expectedCustomers = remainingCustomers.filter(
+          (customer) => customer.postCode === postCode,
+        );
+
+        await test.step(
+          `Attach customers after deletion for postcode ${postCode}`,
+          async () => {
+            await testInfo.attach(
+              `customers-after-deletion-${postCode}`,
+              {
+                body:
+                  await customersPage.captureFilteredCustomerTable(
+                    postCode,
+                    expectedCustomers.length,
+                  ),
+                contentType: 'image/png',
+              },
+            );
+          },
+        );
+      }
     },
   );
 });
