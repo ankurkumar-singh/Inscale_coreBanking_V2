@@ -45,7 +45,6 @@ Playwright and TypeScript-based end-to-end automation framework for testing cust
 ```text
 ├── .github/
 │   └── workflows/               # GitHub Actions CI workflow
-├── fixtures/                    # Assessment reference files
 ├── docs/                        # Exploratory testing and quality report
 ├── models/                      # TypeScript data models
 ├── pages/                       # Page Object Model classes
@@ -145,7 +144,7 @@ The workbook contains:
 
 The Excel reader validates the required columns, transaction types, and transaction amounts before the application workflow begins.
 
-## Test Reporting
+### Test Evidence and Reporting
 
 Open the latest Playwright HTML report:
 
@@ -153,15 +152,17 @@ Open the latest Playwright HTML report:
 npm run report
 ```
 
-The report provides:
+The Playwright HTML report includes:
 
-- Cross-browser execution results
-- Business-readable `test.step()` details
-- Failure screenshots and videos
+- Cross-browser execution results for Chromium, Firefox, and WebKit
+- Business-readable `test.step()` execution details
+- Screenshots and videos for failed tests
 - Traces retained for failed tests
-- Final customer-table screenshot for Q1
+- Filtered customer-table evidence for Q1:
+    - Before deletion: all 7 newly added customers
+    - After deletion: the remaining 5 customers
 - Final account-balance screenshot for Q2
-- Transaction-summary JSON for Q2
+- Transaction-summary JSON attachment for Q2
 
 ## Continuous Integration
 
